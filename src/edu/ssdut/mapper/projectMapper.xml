@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.ssdut.mapper.ProjectMapper">
+
+	<resultMap id="projectResult" type="Project">
+		<result column="p_id" property="id" />
+		<result column="p_name" property="name" />
+		<result column="p_info" property="info" />
+		<result column="p_beginDate" property="beginDate" />
+		<association property="teacher" column="t_number" javaType="Teacher" resultMap="teacherResult"/>
+		<!-- <association property="phases" column="p_id" javaType="ProjectPhase" resultMap="phaseResult"/>
+		 -->
+		<association property="students" column="p_id" javaType="Student" resultMap="studentResult"/>
+	</resultMap>
+	
+	<resultMap id="teacherResult" type="Teacher">
+		<result column="t_number" property="username"/>
+		<result column="t_name" property="name"/>
+	</resultMap>
+	<!--
+	<resultMap id="phaseResult" type="ProjectPhase">
+		<result column = "p_id" property="projectId"/>
+		<result column = "ph_id" property="phaseId"/>
+		<result column = "ph_name" property="name"/>
+		<result column = "ph_file" property="fileName"/>
+	</resultMap>
+	  -->
+	  
+	<resultMap id="studentResult" type="Student">
+		<result column="s_number" property="username" />
+		<result column="s_name" property="name" />
+	</resultMap>
+	
+	<select id="searchById" resultMap="projectResult">
+		select projects.p_id p_id,p_name,p_info,p_beginDate,teachers.t_number,t_name, s_number, s_name
+		from projects join teachers on projects.t_number = teachers.t_number left join students on projects.p_id = students.p_id
+		where projects.p_id = #{id};
+	</select>
+	
+	<!-- 
+	<select id="searchById" resultMap="projectResult">
+		select projects.p_id p_id,p_name,p_info,p_beginDate,teachers.t_number,t_name,ph_id,ph_name,ph_file, s_number, s_name
+		from projects join teachers on projects.t_number = teachers.t_number left join students on projects.p_id = students.p_id  left join phases on projects.p_id = phases.p_id
+		where projects.p_id = #{id};
+	</select>
+	 -->
+	 
+	<select id="searchByName" resultMap="projectResult">
+		select projects.p_id p_id,p_name,p_info,p_beginDate,teachers.t_number,t_name, s_number, s_name
+		from projects join teachers on projects.t_number = teachers.t_number left join students on projects.p_id = students.p_id
+		where projects.p_name = #{name};
+	</select>
+
+	<select id="allProjects" resultMap="projectResult">
+		select projects.p_id p_id,p_name,p_info,p_beginDate,teachers.t_number,t_name, s_number, s_name
+		from projects join teachers on projects.t_number = teachers.t_number left join students on projects.p_id = students.p_id;
+	</select>
+
+	<select id="searchByTeacher" resultMap="projectResult">
+		select projects.p_id p_id,p_name,p_info,p_beginDate,teachers.t_number,t_name, s_number, s_name
+		from projects join teachers on projects.t_number = teachers.t_number left join students on projects.p_id = students.p_id  
+		where teachers.t_number = #{username};
+	</select>
+
+	<select id="fuzzySearch" resultMap="projectResult">
+		select projects.p_id p_id,p_name,p_info,p_beginDate,teachers.t_number,t_name,ph_id,ph_name,ph_file, s_number, s_name
+		from projects join teachers on projects.t_number = teachers.t_number left join students on projects.p_id = students.p_id  left join phases on projects.p_id = phases.p_id
+		where projects.p_name like #{name};
+	</select>
+
+	<insert id="add" parameterType="Project">
+		insert into projects(p_name, p_info, p_beginDate, t_number) values(#{name}, #{info}, #{beginDate}, #{teacher.username});
+	</insert>
+	
+	<update id="update" parameterType="Project">
+		update projects set p_name = #{name}, p_info = #{info}, p_beginDate = #{beginDate} where p_id = #{id};
+	</update>
+	
+	<delete id="delete">
+		delete from projects where p_id = #{id};
+	</delete>
+	
+	<update id="addMember">
+		update students set p_id = #{projectId} where s_number = #{username};
+	</update>
+	
+	<update id="delMember">
+		update students set p_id = null where s_number = #{username};
+	</update>
+	
+	<select id="getMember" resultType="Student">
+		select s_number username, s_name name, s_phone phone, s_email email from students where s_number = #{username} and p_id = #{projectId};
+	</select>
+	
+	<select id="allMembers" resultType="Student">
+		select s_number username, s_name name, s_phone phone, s_email email from students where p_id = #{projectId};
+	</select>
+</mapper>

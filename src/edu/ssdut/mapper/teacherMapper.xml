@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.ssdut.mapper.TeacherMapper">
+	
+	<resultMap id="teacherResult" type="Teacher">
+		<result column="t_number" property="username" />
+		<result column="t_name" property="name" />
+		<result column="t_info" property="info"/>
+		<result column="t_phone" property="phone" />
+		<result column="t_email" property="email" />
+		<association property="projects" column="t_number" javaType="Project" resultMap="projectResult"/>
+	</resultMap>
+	<resultMap id="projectResult" type="Project">
+		<result column="p_id" property="id" />
+		<result column="p_name" property="name" />
+		<result column="p_info" property="info" />
+		<result column="p_beginDate" property="beginDate" />
+	</resultMap>
+
+	 <select id="login" resultType="Teacher">
+	 	select t_number username, t_pwd pwd from teachers where t_number=#{username} and t_pwd=#{pwd}
+	 </select>
+	 
+	<select id="find" resultMap="teacherResult">
+		select A.t_number, t_name, t_pwd, t_info, t_phone, t_email, p_id, p_name, p_info, p_beginDate
+		from teachers A left join projects B on A.t_number = B.t_number
+		where A.t_number=#{username}
+	</select>
+	
+	<insert id="add" parameterType="Teacher">
+		insert into teachers(t_number, t_name, t_pwd, t_info,  t_phone, t_email) values(#{username}, #{name}, #{pwd}, #{info}, #{phone}, #{email})
+	</insert>
+	
+	<update id="update" parameterType="Teacher">
+		update teachers set t_phone=#{phone}, t_info = #{info}, t_email = #{email} where t_number=#{username}
+	</update>
+	
+	<update id="updatePwd">
+		update teachers set t_pwd = #{pwd} where t_number = #{username};
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from teachers where t_number=#{username}
+	</delete>
+	
+	<select id ="allTeachers" resultType="Teacher">
+		select t_number username, t_name name, t_info info, t_phone phone, t_email email from teachers;
+	</select>
+</mapper>

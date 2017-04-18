@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+	namespace：必须与对应的接口全类名一致
+	id:必须与对应接口的某个对应的方法名一致
+	
+ -->
+<mapper namespace="edu.ssdut.mapper.StudentMapper">
+	
+	<resultMap id="studentResult" type="Student">
+		<result column="s_number" property="username" />
+		<result column="s_name" property="name" />
+		<result column="s_phone" property="phone" />
+		<result column="s_email" property="email" />
+		<association property="project" column="p_id" javaType="Project" resultMap="projectResult"/>
+	</resultMap>
+	<resultMap id="projectResult" type="Project">
+		<result column="p_id" property="id" />
+		<result column="p_name" property="name" />
+		<result column="p_info" property="info" />
+		<result column="p_beginDate" property="beginDate" />
+	</resultMap>
+	
+	<!--
+	<select id="login" resultMap="studentResult">
+		select s_number, s_name, s_pwd, s_phone, s_email, B.p_id, p_name, p_info, p_beginDate
+		from students A left join projects B on A.p_id = B.p_id
+		where s_number=#{username} and s_pwd=#{password}
+	</select>
+	 -->
+	 <select id="login" resultType="Student">
+	 	select s_number username, s_pwd pwd from students where s_number=#{username} and s_pwd=#{pwd};
+	 </select>
+	 
+	<select id="find" resultMap="studentResult">
+		select s_number, s_name, s_phone, s_email, B.p_id, p_name, p_info, p_beginDate
+		from students A left join projects B on A.p_id = B.p_id
+		where s_number=#{username};
+	</select>
+
+	<update id="updatePwd">
+		update students set s_pwd = #{pwd} where s_number = #{username};
+	</update>
+	
+	<insert id="add" parameterType="Student">
+		insert into students(s_number, s_name, s_pwd, s_phone, s_email) values(#{username}, #{name}, #{pwd}, #{phone}, #{email})
+	</insert>
+	
+	<update id="update" parameterType="Student">
+		update students set s_phone=#{phone}, s_email = #{email} where s_number=#{username};
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from students where s_number=#{username}
+	</delete>
+	
+	<select id ="allStudents" resultType="Student">
+		select s_number username, s_name name, s_phone phone, s_email email from students;
+	</select>
+</mapper>

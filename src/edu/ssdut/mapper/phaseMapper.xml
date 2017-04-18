@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.ssdut.mapper.PhaseMapper">
+	<insert id="add" parameterType="ProjectPhase">
+		insert into phases(p_id, ph_id, ph_name, ph_file) values(#{projectId}, #{phaseId}, #{name}, #{fileName});
+	</insert>
+
+	<update id="update" parameterType="ProjectPhase">
+		update phases set ph_name = #{name}, ph_file = #{fileName} where p_id = #{projectId} and ph_id = #{phaseId};
+	</update>
+	
+	<delete id="delete">
+		delete from phases where p_id = #{projectId} and ph_id = #{phaseId};
+	</delete>
+	
+	<select id="get" resultType="ProjectPhase">
+		select p_id projectId, ph_id phaseId, ph_name name, ph_file fileName from phases where p_id = #{projectId} and ph_id = #{phaseId};
+	</select>
+	
+	<select id="allPhases" resultType="ProjectPhase">
+		select p_id projectId, ph_id phaseId, ph_name name, ph_file fileName from phases where p_id = #{projectId};
+	</select>
+	
+	<select id="maxPhaseId" resultType="int">
+		select ifnull(max(ph_id), 0) from phases where p_id = #{projectId};
+	</select>
+</mapper>
